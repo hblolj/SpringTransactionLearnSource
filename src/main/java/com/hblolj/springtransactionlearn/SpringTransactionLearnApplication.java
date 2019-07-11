@@ -23,5 +23,4 @@ public class SpringTransactionLearnApplication {
         return new Object();
     }
 
-
 }

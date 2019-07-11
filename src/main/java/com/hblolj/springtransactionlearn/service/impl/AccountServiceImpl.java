@@ -23,9 +23,6 @@ public class AccountServiceImpl implements AccountService{
     @Autowired
     private AccountMapper accountMapper;
 
-    @Autowired
-    private AccountService accountService;
-
     @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public Boolean addNewAccount(Long userId, String userName, BigDecimal money) {
@@ -35,34 +32,39 @@ public class AccountServiceImpl implements AccountService{
     @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public Boolean transferAccount(Long outUserId, Long inUserId, BigDecimal money) {
-        Boolean result;
-        accountService.reduceMoney(outUserId, money);
-//        if (!result){
-//            throw new RuntimeException("扣钱失败");
-//        }
+
 //        try {
-//        result = plusMoney(inUserId, money);
+//            ((AccountService) AopContext.currentProxy()).reduceMoney(outUserId, money);
 //        }catch (Exception e){
 //            e.printStackTrace();
 //        }
-//        if (!result){
-            throw new RuntimeException("加钱失败");
+        // 外层执行，扣钱
+        accountMapper.reduceMoney(outUserId, money);
+
+//        try {
+            ((AccountService) AopContext.currentProxy()).plusMoney(inUserId, money);
+//        }catch (Exception e){
+//            e.printStackTrace();
 //        }
-//        return true;
+
+//        throw new RuntimeException("模拟外层异常");
+
+        return true;
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.NESTED)
     @Override
     public Boolean reduceMoney(Long userId, BigDecimal money) {
         return 1 == accountMapper.reduceMoney(userId, money);
+//        accountMapper.reduceMoney(userId, money);
+//        throw new RuntimeException("模拟扣钱失败");
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional(propagation = Propagation.NESTED)
     @Override
     public Boolean plusMoney(Long userId, BigDecimal money) {
 //        return 1 == accountMapper.plusMoney(userId, money);
         accountMapper.plusMoney(userId, money);
-//        return false;
         throw new RuntimeException("模拟加钱失败");
     }
 }

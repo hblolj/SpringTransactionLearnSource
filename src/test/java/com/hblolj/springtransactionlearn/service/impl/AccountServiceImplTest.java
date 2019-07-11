@@ -31,7 +31,12 @@ public class AccountServiceImplTest extends SpringTransactionLearnApplicationTes
 
     @Test
     public void testTransferAccount() throws Exception {
-        Boolean result = accountService.transferAccount(3L, 4L, new BigDecimal(50));
+        // 1. 前后都成功
+        // 2. 前面失败，不捕获异常，后面成功
+        // 3. 前面失败，捕获异常，后面成功
+        // 4. 前面成功，后面失败，不捕获异常
+        // 5. 前面成功，后面失败，捕获异常
+        Boolean result = accountService.transferAccount(3L, 4L, new BigDecimal(1000));
         Assert.assertTrue(result);
     }
 
